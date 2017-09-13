@@ -150,6 +150,7 @@ class EchoClientProtocol(Protocol):
 
 
 def UnitTest1():
+    set_event_loop(TestLoopEx())
     clientProtocol = EchoClientProtocol()
     serverProtocol = EchoServerProtocol()
     transportToServer = MockTransportToProtocol(myProtocol=clientProtocol)
@@ -164,6 +165,7 @@ def UnitTest1():
 
 
 def UnitTest2():
+    set_event_loop(TestLoopEx())
     clientProtocol = EchoClientProtocol()
     serverProtocol = EchoServerProtocol()
     cTransport, sTransport = MockTransportToProtocol.CreateTransportPair(clientProtocol, serverProtocol)
