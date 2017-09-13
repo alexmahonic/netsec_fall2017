@@ -97,9 +97,11 @@ class EchoServerProtocol(Protocol):
 
 
 class EchoClientProtocol(Protocol):
-    def __init__(self):
-        self.transport = None
+    def __init__(self, callback = None):
+        if callback:
+            self.callback = callback
 
+        self.transport = None
         self.rl = RequestLogin()
         self.rl.LoginRequest = True
 
@@ -148,28 +150,28 @@ class EchoClientProtocol(Protocol):
 
 
 def UnitTest1():
-    set_event_loop(TestLoopEx())
-    client = EchoClientProtocol()
-    server = EchoServerProtocol()
-    transportToServer = MockTransportToProtocol(server)
-    transportToClient = MockTransportToProtocol(client)
-    server.connection_made(transportToClient)
-    client.connection_made(transportToServer)
+    clientProtocol = EchoClientProtocol()
+    serverProtocol = EchoServerProtocol()
+    transportToServer = MockTransportToProtocol(myProtocol=clientProtocol)
+    transportToClient = MockTransportToProtocol(myProtocol=serverProtocol)
+    transportToServer.setRemoteTransport(transportToClient)
+    transportToClient.setRemoteTransport(transportToServer)
+    clientProtocol.connection_made(transportToServer)
+    serverProtocol.connection_made(transportToClient)
 
-    client.SetIdentityInfo(123, "Alex", "2017alex")
-    client.SendLoginRequest()
+    clientProtocol.SetIdentityInfo(123, "Alex", "2017alex")
+    clientProtocol.SendLoginRequest()
+
 
 def UnitTest2():
-    set_event_loop(TestLoopEx())
-    client = EchoClientProtocol()
-    server = EchoServerProtocol()
-    transportToServer = MockTransportToProtocol(server)
-    transportToClient = MockTransportToProtocol(client)
-    server.connection_made(transportToClient)
-    client.connection_made(transportToServer)
+    clientProtocol = EchoClientProtocol()
+    serverProtocol = EchoServerProtocol()
+    cTransport, sTransport = MockTransportToProtocol.CreateTransportPair(clientProtocol, serverProtocol)
+    clientProtocol.connection_made(cTransport)
+    serverProtocol.connection_made(sTransport)
 
-    client.SetIdentityInfo(123, "Jack", "2017jack")
-    client.SendLoginRequest()
+    clientProtocol.SetIdentityInfo(123, "Jack", "2017jack")
+    clientProtocol.SendLoginRequest()
 
 if __name__ == "__main__":
     UnitTest1()
