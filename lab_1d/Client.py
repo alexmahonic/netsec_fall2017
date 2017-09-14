@@ -48,11 +48,11 @@ class Result(PacketType):
 
 
 class EchoClientProtocol(Protocol):
-    def __init__(self, loop):
+    def __init__(self):
         # if callback:
         #     self.callback = callback
         # self.msg = msg
-        self.loop = loop
+        # self.loop = loop
         self.transport = None
         self.rl = RequestLogin()
         self.rl.LoginRequest = True
@@ -103,7 +103,9 @@ class EchoClientProtocol(Protocol):
 
 if __name__ == "__main__":
     loop = get_event_loop()
-    coro = loop.create_connection(lambda: EchoClientProtocol(loop).SendLoginRequest(), '20174.0.0.0', 8000)
-    loop.run_until_complete(coro)
+    coro = loop.create_connection(lambda: EchoClientProtocol(), '127.0.0.1', 8000)
+    mytransport, myprotocol = loop.run_until_complete(coro)
+    myprotocol.SetIdentityInfo(123, "Alex", "2017alex")
+    myprotocol.SendLoginRequest()
     loop.run_forever()
     loop.close()

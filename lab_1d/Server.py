@@ -98,14 +98,9 @@ class EchoServerProtocol(Protocol):
 
 if __name__ == "__main__":
     loop = get_event_loop()
-    coro = loop.create_server(EchoServerProtocol, '20174.0.0.0', 8000)
-    server = loop.run_until_complete(coro)
+    coro = loop.create_server(lambda:EchoServerProtocol(), 8000)
+    myserver = loop.run_until_complete(coro)
+    loop.run_forever()
 
-    try:
-        loop.run_forever()
-    except KeyboardInterrupt:
-        pass
-
-    server.close()
-    loop.run_until_complete(server.wait_close())
+    myserver.close()
     loop.close()
