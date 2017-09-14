@@ -1,4 +1,5 @@
 from asyncio import *
+from packet import RequestLogin, Result, Answer, IdentifyInfo
 from playground.network.packet import PacketType
 from playground.network.packet.fieldtypes import UINT32, STRING, BUFFER, BOOL
 from playground.network.common import PlaygroundAddress
@@ -8,53 +9,13 @@ from playground.network.testing import MockTransportToStorageStream
 from playground.network.testing import MockTransportToProtocol
 
 
-class RequestLogin(PacketType):
-    DEFINITION_IDENTIFIER = "lab1c.student_alex1.MyPacket"
-    DEFINITION_VERSION = "2.0"
-
-    FIELDS = [
-        ("LoginRequest", BOOL)
-    ]
-
-
-class IdentifyInfo(PacketType):
-    DEFINITION_IDENTIFIER = "lab1c.student_alex2.MyPacket"
-    DEFINITION_VERSION = "2.0"
-
-    FIELDS = [
-        ("pin", UINT32),
-        ("IDRequest", STRING),
-        ("PSWRequest", STRING)
-    ]
-
-
-class Answer(PacketType):
-    DEFINITION_IDENTIFIER = "lab1c.student_alex3.MyPacket"
-    DEFINITION_VERSION = "2.0"
-
-    FIELDS = [
-        ("pin", UINT32),
-        ("ID", STRING),
-        ("PSW", STRING)
-    ]
-
-
-class Result(PacketType):
-    DEFINITION_IDENTIFIER = "lab1c.student_alex4.MyPacket"
-    DEFINITION_VERSION = "2.0"
-
-    FIELDS = [
-        ("pin", STRING),
-        ("PassOrFail", BOOL)
-    ]
-
 
 class EchoClientProtocol(Protocol):
     def __init__(self):
         # if callback:
         #     self.callback = callback
         # self.msg = msg
-        # self.loop = loop
+        self.loop = loop
         self.transport = None
         self.rl = RequestLogin()
         self.rl.LoginRequest = True
@@ -105,7 +66,7 @@ class EchoClientProtocol(Protocol):
 
 if __name__ == "__main__":
     loop = get_event_loop()
-    coro = playground.getConnector().create_playground_connection(lambda: EchoClientProtocol(), '20174.1.1.1', 58300)
+    coro = playground.getConnector().create_playground_connection(lambda: EchoClientProtocol(), '20174.1.1.1', 8000)
     mytransport, myprotocol = loop.run_until_complete(coro)
     myprotocol.SetIdentityInfo(123, "Alex", "2017alex")
     myprotocol.SendLoginRequest()

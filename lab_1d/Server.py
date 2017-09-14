@@ -1,4 +1,5 @@
 from asyncio import *
+from packet import RequestLogin, Result, Answer, IdentifyInfo
 from playground.network.packet import PacketType
 from playground.network.packet.fieldtypes import UINT32, STRING, BUFFER, BOOL
 import playground
@@ -8,45 +9,6 @@ from playground.network.testing import MockTransportToStorageStream
 from playground.network.testing import MockTransportToProtocol
 
 
-class RequestLogin(PacketType):
-    DEFINITION_IDENTIFIER = "lab1c.student_a1.MyPacket"
-    DEFINITION_VERSION = "3.0"
-
-    FIELDS = [
-        ("LoginRequest", BOOL)
-    ]
-
-
-class IdentifyInfo(PacketType):
-    DEFINITION_IDENTIFIER = "lab1c.student_a2.MyPacket"
-    DEFINITION_VERSION = "3.0"
-
-    FIELDS = [
-        ("pin", UINT32),
-        ("IDRequest", STRING),
-        ("PSWRequest", STRING)
-    ]
-
-
-class Answer(PacketType):
-    DEFINITION_IDENTIFIER = "lab1c.student_a3.MyPacket"
-    DEFINITION_VERSION = "3.0"
-
-    FIELDS = [
-        ("pin", UINT32),
-        ("ID", STRING),
-        ("PSW", STRING)
-    ]
-
-
-class Result(PacketType):
-    DEFINITION_IDENTIFIER = "lab1c.student_a4.MyPacket"
-    DEFINITION_VERSION = "3.0"
-
-    FIELDS = [
-        ("pin", STRING),
-        ("PassOrFail", BOOL)
-    ]
 
 
 class EchoServerProtocol(Protocol):
@@ -72,9 +34,9 @@ class EchoServerProtocol(Protocol):
         self.deserializer = PacketType.Deserializer()
 
     def connection_made(self, transport):
-        # print("Server Connected to client...")
-        peername = transport.get_extra_info("peername")
-        print('Connection from {}'.format(peername))
+        print("Server Connected to client...")
+        # peername = transport.get_extra_info("peername")
+        # print('Connection from {}'.format(peername))
         self.transport = transport
 
     def data_received(self, data):
@@ -101,8 +63,11 @@ class EchoServerProtocol(Protocol):
 if __name__ == "__main__":
     loop = get_event_loop()
     # coro = loop.create_server(lambda:EchoServerProtocol(),'127.0.0.1', 8000)
-    coro = playground.getConnector().create_playground_server(lambda : EchoServerProtocol(), 58300)
+    coro = playground.getConnector().create_playground_server(lambda : EchoServerProtocol(), 8000)
     myserver = loop.run_until_complete(coro)
+
+    loop.set_debug(enabled=True)
+
     loop.run_forever()
     myserver.close()
     loop.close()
