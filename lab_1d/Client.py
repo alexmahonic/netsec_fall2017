@@ -105,7 +105,7 @@ class EchoClientProtocol(Protocol):
 
 if __name__ == "__main__":
     loop = get_event_loop()
-    coro = playground.getConnector.create_playground_connection(lambda: EchoClientProtocol(), '20174.1.1.1', 58300)
+    coro = playground.getConnector().create_playground_connection(lambda: EchoClientProtocol(), '20174.1.1.1', 58300)
     mytransport, myprotocol = loop.run_until_complete(coro)
     myprotocol.SetIdentityInfo(123, "Alex", "2017alex")
     myprotocol.SendLoginRequest()
