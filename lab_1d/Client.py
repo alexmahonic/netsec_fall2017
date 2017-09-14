@@ -1,6 +1,8 @@
 from asyncio import *
 from playground.network.packet import PacketType
 from playground.network.packet.fieldtypes import UINT32, STRING, BUFFER, BOOL
+from playground.network.common import PlaygroundAddress
+import playground
 from playground.asyncio_lib.testing import TestLoopEx
 from playground.network.testing import MockTransportToStorageStream
 from playground.network.testing import MockTransportToProtocol
@@ -74,7 +76,7 @@ class EchoClientProtocol(Protocol):
         print("Client connects to Server...")
         self.transport = transport
         print("Client: I want to Log in.")
-        self.transport.write(self.msg.__serialize__())
+        # self.transport.write(self.rl.__serialize__())
 
     def data_received(self, data):
         self.deserializer.update(data)
@@ -103,7 +105,7 @@ class EchoClientProtocol(Protocol):
 
 if __name__ == "__main__":
     loop = get_event_loop()
-    coro = loop.create_connection(lambda: EchoClientProtocol(), '127.0.0.1', 8000)
+    coro = playground.getConnector.create_playground_connection(lambda: EchoClientProtocol(), '20174.1.1.1', 58300)
     mytransport, myprotocol = loop.run_until_complete(coro)
     myprotocol.SetIdentityInfo(123, "Alex", "2017alex")
     myprotocol.SendLoginRequest()
